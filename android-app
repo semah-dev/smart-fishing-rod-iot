@@ -1,1 +1,15 @@
+# Android Application
 
+## Description
+Android application developed using Java to display sensor data
+and suggest fish species based on environmental conditions.
+
+## Features
+- Display temperature, salinity, and current values
+- Local SQLite database
+- Simple and clean UI
+
+## Technologies
+- Java
+- Android Studio
+- SQLite
