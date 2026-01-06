@@ -1,1 +1,5 @@
+# Sensors
 
+- Temperature sensor: measures water temperature
+- Mouvement sensor:measures the distance between the sensor and the fish
+- Current sensor: measures water flow speed
