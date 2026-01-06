@@ -1,1 +1,146 @@
+code sensores
+temperature code :
+#include <OneWire.h>
+#include <DallasTemperature.h>
+
+#define ONE_WIRE_BUS 4
+OneWire oneWire(ONE_WIRE_BUS);
+DallasTemperature sensors(&oneWire);
+
+DeviceAddress capteur;
+
+void setup() {
+  Serial.begin(1152A00);
+  sensors.begin();
+  if (sensors.getAddress(capteur, 0)) {
+    Serial.print("Adresse du capteur : ");
+    for (uint8_t i = 0; i < 8; i++) {
+      Serial.print(capteur[i], HEX);
+      Serial.print(" ");
+    }
+    Serial.println();
+  } else {
+    Serial.println("Capteur non détecté !");
+  }
+}
+
+void loop() {
+  sensors.requestTemperatures();
+  delay(750);
+  float tempC = sensors.getTempC(capteur);
+  Serial.print("Température : ");
+  Serial.print(tempC);
+  Serial.println(" °C");
+  delay(50000);
+}
+
+current  code :
+#include <Arduino.h>
+
+// --- Configuration ---
+// GPIO elli rbat't fih el pin D0 mta3 el KY-003
+#define HALL_SENSOR_PIN_D0 4
+
+// --- Variables Globales ---
+// 'volatile' khater nesta3mlouha fi interrupt w barra
+volatile unsigned long pulseCount = 0;
+// Timing lel 7seb mta3 el fréquence
+unsigned long lastTimeCheck = 0;
+// Intervalle bin kol 7seb fréquence (bel millisecondes)
+const unsigned long frequencyInterval = 1000; // Kol 1 seconde (1000 ms)
+
+// --- Fonction mta3 el Interrupt (ISR) ---
+// Tetnada automatiquement kol ma el KY-003 yeb3ath pulse (falling edge)
+// Lazemha tkoun khfifa barcha
+void IRAM_ATTR countPulse() {
+  // Just nzidou el compteur
+  pulseCount++;
+}
+
+// --- SETUP : Khedma tet3mal marra wa7da ---
+void setup() {
+  // N7ellou el Serial lel communication / débogage
+  Serial.begin(115200);
+  Serial.println("\n\n--- ESP32 Hall Sensor Frequency ---");
+  Serial.println("Prêt à détecter les passages du aimant...");
+
+  // N7adhrou el GPIO lel capteur Hall
+  // INPUT_PULLUP mouhemma bech el pin yab9a HIGH ki ma famech magnatis
+  pinMode(HALL_SENSOR_PIN_D0, INPUT_PULLUP);
+
+ 
+attachInterrupt(digitalPinToInterrupt(HALL_SENSOR_PIN_D0), countPulse, RISING);
+
+
+  lastTimeCheck = millis();
+}
+
+
+void loop() {
+  // Nakhedhou el wa9t el 7ali
+  unsigned long currentTime = millis();
+
+ 
+  if (currentTime - lastTimeCheck >= frequencyInterval) {
+
+   
+    noInterrupts();
+    unsigned long pulsesInInterval = pulseCount; 
+    pulseCount = 0; 
+    interrupts(); 
+    
+
+  
+    float elapsedTimeSec = (float)(currentTime - lastTimeCheck) / 1000.0;
+
+    
+    if (elapsedTimeSec > 0) {
+      frequency = (float)pulsesInInterval / elapsedTimeSec;
+    }
+
+   
+    Serial.print("FREQ:"); // Nzidou "FREQ:" kima tnajjem taqraha l'app
+    Serial.println(frequency, 2); // Neb3thouha b 2 chiffres ba3d el fasel
+
+   
+    lastTimeCheck = currentTime;
+
+  } 
+}
+
+movement code :
+#define TRIG_PIN 18
+#define ECHO_PIN 5
+    long duration;
+    float distance;
+
+void setup() {
+    Serial.begin(115200);
+    pinMode(TRIG_PIN, OUTPUT);
+    pinMode(ECHO_PIN, INPUT);
+    Serial.println("JSN-SR04T Distance Sensor Example");
+}
+
+void loop() {
+
+
+    // Trigger the sensor
+    digitalWrite(TRIG_PIN, LOW);
+    delay(20);
+    digitalWrite(TRIG_PIN, HIGH);
+    delay(10);
+    digitalWrite(TRIG_PIN, LOW);
+
+    // Read the Echo pin
+    duration = pulseIn(ECHO_PIN, HIGH);
+
+    // Calculate distance in cm
+    distance = duration * 0.034 / 2;
+
+    Serial.print("Distance: ");
+    Serial.print(distance);
+    Serial.println(" cm");
+
+    delay(500);
+}
 
